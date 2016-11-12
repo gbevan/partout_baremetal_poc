@@ -77,7 +77,7 @@ p2
 
 ////////////////////////////
 // PXE config for manager1
-.file(path.join(tftp_root, 'pxelinux.cfg', manager1_mac), {
+.file(path.join(tftp_root, 'pxelinux.cfg', '01-' + manager1_mac.replace(/:/g, '-')), {
   ensure: 'present',
   content: {
     template: path.join(__dirname, 'files', 'default.template')
@@ -104,7 +104,7 @@ p2
 
 ////////////////////////////
 // PXE config for compute1
-.file(path.join(tftp_root, 'pxelinux.cfg', compute1_mac), {
+.file(path.join(tftp_root, 'pxelinux.cfg', '01-' + compute1_mac.replace(/:/g, '-')), {
   ensure: 'present',
   content: {
     template: path.join(__dirname, 'files', 'default.template')

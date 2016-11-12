@@ -86,7 +86,7 @@ apt-get install -y nfs-common
 
 mkdir -p /opt/partout/agent
 
-echo "{{ opts.partout_master }}:{{ opts.partout_export }}  /opt/partout/agent nfs defaults,ro,nolock,intr,soft,timeo=3,retrans=5 0 0" >> /etc/fstab
+echo "{{ opts.partout_master }}:{{{ opts.partout_export }}}  /opt/partout/agent nfs defaults,ro,nolock,intr,soft,timeo=3,retrans=5 0 0" >> /etc/fstab
 
 mount -a
 
