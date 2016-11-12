@@ -1,0 +1,96 @@
+/*
+    Partout [Everywhere] - Policy-Based Configuration Management for the
+    Data-Driven-Infrastructure.
+
+    Copyright (C) 2016 Graham Lee Bevan <graham.bevan@ntlworld.com>
+
+    This file is part of Partout.
+
+    Partout is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/*jslint node: true, nomen: true */
+'use strict';
+/*global p2*/
+
+// make parent node_modules available to sync'd manifest
+module.paths = module.paths.concat(module.parent.paths);
+
+var console = require('better-console'),
+    utils = p2.require('utils'),
+    u = require('util'),
+    fs = require('fs'),
+    path = require('path'),
+    heredoc = require('heredoc'),
+    Q = require('q'),
+    _ = require('lodash');
+
+p2
+
+/**
+ * @module dnsmasq
+ *
+ * @description
+ * Role: dnsmasq
+ * ================
+ * ```javascript
+ * .dnsmasq('pxe', {
+ * })
+ * ```
+ */
+.role('dnsmasq', {
+  p2: function (title, opts) {
+    p2
+
+    .node(function (f) {
+      return f.os_family === 'debian' && p2.hasClass('pxe');
+    })
+
+    .logmsg('Configuring dnsmasq: {{ opts.title }}', {title: title, level: 'info'})
+
+    .file('/media/usb/tftproot', {ensure: 'directory'})
+
+    .package('wget')
+    .package('syslinux-common')
+    .package('pxelinux')
+    .package('nginx')
+
+    .package('nfs-kernel-server')
+    .package('initramfs-tools')
+
+    .package('dnsmasq')
+    .service('dnsmasq', {ensure: 'running', enabled: true})
+
+    .file('/etc/dnsmasq.conf', {
+      ensure: 'file',
+      content: {template: path.join(__dirname, 'files', 'dnsmasq.conf')},
+      dhcp_hosts: opts.dhcp_hosts,
+      dhcp_range: opts.dhcp_range,
+      iface: opts.iface,
+      tftp_root: opts.tftp_root
+    })
+
+    .on('file:/etc/dnsmasq.conf:changed', function () {
+      p2
+      .service('dnsmasq', {ensure: 'stopped'})
+      .service('dnsmasq', {ensure: 'running'})
+      ;
+    })
+
+    ;
+
+  }
+})
+
+;

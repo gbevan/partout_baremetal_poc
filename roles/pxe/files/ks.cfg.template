@@ -1,0 +1,96 @@
+# THIS IS KICKSTART from Partout
+
+#preseed partman-lvm/confirm_nooverwrite boolean true
+preseed partman-lvm/confirm boolean true
+preseed partman-lvm/confirm_overwrite boolean true
+preseed partman-lvm/device_remove_lvm boolean true
+
+
+lang en_GB
+
+langsupport en_GB
+
+#System keyboard
+keyboard uk
+
+#System mouse
+mouse
+
+#System timezone
+timezone Europe/London
+
+#Root password
+rootpw --disabled
+
+#Initial user (user with sudo capabilities)
+user ubuntu --fullname "Ubuntu User" --password {{{ opts.default_pw }}}
+
+#Reboot after installation
+reboot
+
+#Use text mode install
+#text
+
+#Install OS instead of upgrade
+install
+
+#Installation media
+#cdrom
+#nfs --server=server.com --dir=/path/to/ubuntu/
+
+#Clear the Master Boot Record
+zerombr
+
+#System bootloader configuration
+bootloader --location=mbr
+#bootloader --location=partition
+
+#Partition clearing information
+clearpart --drives=sda --all --initlabel
+
+#Basic disk partition
+part /boot --fstype ext4 --size 256 --asprimary
+part / --fstype ext4 --size 1 --grow --asprimary
+part swap --size 32768
+
+#Advanced partition
+#part /boot --fstype=ext4 --size=500 --asprimary
+#part pv.aQcByA-UM0N-siuB-Y96L-rmd3-n6vz-NMo8Vr --grow --size=1
+#volgroup vg_mygroup --pesize=4096 pv.aQcByA-UM0N-siuB-Y96L-rmd3-n6vz-NMo8Vr
+#logvol / --fstype=ext4 --name=lv_root --vgname=vg_mygroup --grow --size=10240 --maxsize=20480
+#logvol swap --name=lv_swap --vgname=vg_mygroup --grow --size=1024 --maxsize=8192
+
+#System authorization infomation
+auth  --useshadow  --enablemd5
+
+#Network information
+#network --bootproto=dhcp --device=eth0
+network --bootproto=dhcp --device=enp0s8
+network --bootproto=static --device=enp0s9 --ip={{ opts.ip }} --netmask={{ opts.netmask }} --gateway={{ opts.gateway }} --nameserver={{ opts.dnsserver }}
+
+#Firewall configuration
+#firewall --disabled --trust=eth0 --ssh
+firewall --disabled --trust=enp0p8 --ssh
+
+#Do not configure the X Window System
+skipx
+
+%post
+apt-get install -y curl
+
+sleep 10
+curl -sL https://deb.nodesource.com/setup_4.x | bash -
+
+apt-get install -y nodejs
+apt-get install -y nfs-common
+
+mkdir -p /opt/partout/agent
+
+echo "{{ opts.partout_master }}:{{ opts.partout_export }}  /opt/partout/agent nfs defaults,ro,nolock,intr,soft,timeo=3,retrans=5 0 0" >> /etc/fstab
+
+mount -a
+
+cd /opt/partout/agent
+bin/partout-agent --once --yes
+
+sleep 60

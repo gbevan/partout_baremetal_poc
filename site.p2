@@ -1,0 +1,130 @@
+/*
+    Partout [Everywhere] - Policy-Based Configuration Management for the
+    Data-Driven-Infrastructure.
+
+    Copyright (C) 2016 Graham Lee Bevan <graham.bevan@ntlworld.com>
+
+    This file is part of Partout.
+
+    Partout is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+/*jslint node: true, nomen: true */
+'use strict';
+/*global p2*/
+
+var manager1_mac = '6c:f0:49:44:c4:92',
+    compute1_mac = '6c:f0:49:44:ca:62';
+
+var dhcp_hosts = [
+  { name: 'manager1', ip: '172.18.0.1', mac: manager1_mac },
+  { name: 'compute1', ip: '172.18.0.3', mac: compute1_mac }
+];
+
+var dhcp_range = { from: '172.18.0.10', to: '172.18.0.253', lease_time: '12h' };
+var iface = 'eth1';
+var tftp_root = '/media/usb/tftproot';
+var dhcp_server_ip = '172.18.0.254';
+var default_pw = 'root4me2';
+var gateway = '192.168.0.1';
+var netmask = '255.255.255.0';
+var dnsserver = '194.168.4.100';
+var partout_master = '192.168.0.64';
+var partout_export = '/home/bev/Documents/Brackets/partout/agent';
+
+var path = require('path');
+
+p2
+
+.include('roles/pxe')
+
+.node('pi3')
+.classify('pxe')
+
+
+.node(true)
+.dnsmasq('pxe on pi3', {
+  dhcp_hosts: dhcp_hosts,
+  dhcp_range: dhcp_range,
+  iface: iface,
+  tftp_root: tftp_root
+})
+
+/*
+ * Download and extract ubuntu netboot
+ */
+.command('wget http://archive.ubuntu.com/ubuntu/dists/xenial-updates/main/installer-amd64/current/images/netboot/netboot.tar.gz', {
+  cwd: tftp_root,
+  creates: path.join(tftp_root, 'netboot.tar.gz')
+})
+
+.command('tar zxvf netboot.tar.gz', {
+  cwd: tftp_root,
+  creates: 'pxelinux.0'
+})
+
+
+////////////////////////////
+// PXE config for manager1
+.file(path.join(tftp_root, 'pxelinux.cfg', manager1_mac), {
+  ensure: 'present',
+  content: {
+    template: path.join(__dirname, 'files', 'default.template')
+  },
+  dhcp_server_ip: dhcp_server_ip,
+  name: 'manager1'  // for ks_{{name}}.cfg, below
+})
+
+.file('/var/www/html/ks_manager1.cfg', {
+  ensure: 'present',
+  content: {
+    template: path.join(__dirname, 'files', 'ks.cfg.template')
+  },
+  default_pw: default_pw,
+  dnsserver: dnsserver,
+  gateway: gateway,
+  netmask: netmask,
+  ip: '192.168.0.80',
+  partout_export: partout_export,
+  partout_master: partout_master
+})
+////////////////////////////
+
+
+////////////////////////////
+// PXE config for compute1
+.file(path.join(tftp_root, 'pxelinux.cfg', compute1_mac), {
+  ensure: 'present',
+  content: {
+    template: path.join(__dirname, 'files', 'default.template')
+  },
+  dhcp_server_ip: dhcp_server_ip,
+  name: 'compute1'  // for ks_{{name}}.cfg, below
+})
+
+.file('/var/www/html/ks_compute1.cfg', {
+  ensure: 'present',
+  content: {
+    template: path.join(__dirname, 'files', 'ks.cfg.template')
+  },
+  default_pw: default_pw,
+  dnsserver: dnsserver,
+  gateway: gateway,
+  netmask: netmask,
+  ip: '192.168.0.81',
+  partout_export: partout_export,
+  partout_master: partout_master
+})
+////////////////////////////
+;
