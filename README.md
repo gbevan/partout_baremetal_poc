@@ -3,7 +3,7 @@
 Developed in conjunction with the [Partout OpenStack PoC Project](https://github.com/gbevan/partout_openstack_poc) and
 [Partout DevOps Tool](https://github.com/partoutx/partout) - Provisioning from bare metal to a private OpenStack cloud.
 
-The project PXE boots a pair of blades from a Raspberry pi3, handing off controller to Partout to provision OpenStack.
+The project PXE boots a pair of blades from a Raspberry pi3, handing off control to Partout to provision OpenStack.
 
 ## Components
 
