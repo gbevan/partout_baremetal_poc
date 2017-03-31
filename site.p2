@@ -24,11 +24,18 @@
 'use strict';
 /*global p2*/
 
-var manager1_mac = '6c:f0:49:44:c4:92',
+var cfg = require('./site.conf.json');
+
+//var controller1_mac = '6c:f0:49:44:c4:92',
+//    compute1_mac = '6c:f0:49:44:ca:62',
+//    cinder1_mac = '6c:f0:49:43:7b:50';
+var controller1_mac = '6c:f0:49:43:7b:50',
+    cinder1_mac = '6c:f0:49:44:c4:92',
     compute1_mac = '6c:f0:49:44:ca:62';
 
 var dhcp_hosts = [
-  { name: 'manager1', ip: '172.18.0.1', mac: manager1_mac },
+  { name: 'controller1', ip: '172.18.0.1', mac: controller1_mac },
+  { name: 'cinder1', ip: '172.18.0.2', mac: cinder1_mac },
   { name: 'compute1', ip: '172.18.0.3', mac: compute1_mac }
 ];
 
@@ -36,7 +43,7 @@ var dhcp_range = { from: '172.18.0.10', to: '172.18.0.253', lease_time: '12h' };
 var iface = 'eth1';
 var tftp_root = '/media/usb/tftproot';
 var dhcp_server_ip = '172.18.0.254';
-var default_pw = 'root4me2';
+var default_pw = cfg.default_pw;
 var gateway = '192.168.0.1';
 var netmask = '255.255.255.0';
 var dnsserver = '194.168.4.100';
@@ -52,6 +59,10 @@ p2
 .node('pi3')
 .classify('pxe')
 
+.package('smartmontools')
+.package('ntp')
+.package('ntpdate')
+.service('ntp', {enabled: true, ensure: 'running'})
 
 .node(true)
 .dnsmasq('pxe on pi3', {
@@ -76,17 +87,17 @@ p2
 
 
 ////////////////////////////
-// PXE config for manager1
-.file(path.join(tftp_root, 'pxelinux.cfg', '01-' + manager1_mac.replace(/:/g, '-')), {
+// PXE config for controller1
+.file(path.join(tftp_root, 'pxelinux.cfg', '01-' + controller1_mac.replace(/:/g, '-')), {
   ensure: 'present',
   content: {
     template: path.join(__dirname, 'files', 'default.template')
   },
   dhcp_server_ip: dhcp_server_ip,
-  name: 'manager1'  // for ks_{{name}}.cfg, below
+  name: 'controller1'  // for ks_{{name}}.cfg, below
 })
 
-.file('/var/www/html/ks_manager1.cfg', {
+.file('/var/www/html/ks_controller1.cfg', {
   ensure: 'present',
   content: {
     template: path.join(__dirname, 'files', 'ks.cfg.template')
@@ -95,9 +106,37 @@ p2
   dnsserver: dnsserver,
   gateway: gateway,
   netmask: netmask,
-  ip: '192.168.0.80',
+  ip: '192.168.0.90',
   partout_export: partout_export,
   partout_master: partout_master
+})
+////////////////////////////
+
+
+////////////////////////////
+// PXE config for cinder1
+.file(path.join(tftp_root, 'pxelinux.cfg', '01-' + cinder1_mac.replace(/:/g, '-')), {
+  ensure: 'present',
+  content: {
+    template: path.join(__dirname, 'files', 'default.template')
+  },
+  dhcp_server_ip: dhcp_server_ip,
+  name: 'cinder1'  // for ks_{{name}}.cfg, below
+})
+
+.file('/var/www/html/ks_cinder1.cfg', {
+  ensure: 'present',
+  content: {
+    template: path.join(__dirname, 'files', 'ks_cinder.cfg.template')
+  },
+  default_pw: default_pw,
+  dnsserver: dnsserver,
+  gateway: gateway,
+  netmask: netmask,
+  ip: '192.168.0.92',
+  partout_export: partout_export,
+  partout_master: partout_master,
+  hostname: 'cinder1'
 })
 ////////////////////////////
 

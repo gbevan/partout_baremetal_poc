@@ -48,10 +48,18 @@ bootloader --location=mbr
 #Partition clearing information
 clearpart --drives=sda --all --initlabel
 
-#Basic disk partition
+####################################################
+# Partitions
 part /boot --fstype ext4 --size 256 --asprimary
-part / --fstype ext4 --size 1 --grow --asprimary
+
+part / --fstype ext4 --size 100000 --asprimary
 part swap --size 32768
+
+part pv.01 --grow
+volgroup cinder-volumes pv.01
+
+####################################################
+
 
 #Advanced partition
 #part /boot --fstype=ext4 --size=500 --asprimary
@@ -76,10 +84,6 @@ firewall --disabled --trust=enp0p8 --ssh
 skipx
 
 %post
-export DEBIAN_FRONTEND="noninteractive"
-export APT_LISTBUGS_FRONTEND="none"
-export APT_LISTCHANGES_FRONTEND="none"
-
 apt-get install -y aptitude
 apt-get install -y ssh
 apt-get install -y curl

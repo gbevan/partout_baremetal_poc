@@ -14,7 +14,8 @@ The project PXE boots a pair of blades from a Raspberry pi3, handing off control
 ## Force a PXEboot to reprovision a blade
 WARNING: This erases the MBR boot record on your disk.
 ```bash
-ssh manager1 -l ubuntu "sudo dd if=/dev/zero of=/dev/sda bs=512 count=1 && sudo reboot"
+ssh controller1 -l ubuntu "sudo dd if=/dev/zero of=/dev/sda bs=512 count=1 && sudo reboot"
+ssh cinder1 -l ubuntu "sudo dd if=/dev/zero of=/dev/sda bs=512 count=1 && sudo reboot"
 ssh compute1 -l ubuntu "sudo dd if=/dev/zero of=/dev/sda bs=512 count=1 && sudo reboot"
 ```
 
@@ -37,7 +38,7 @@ COPYRIGHT
   Partout [Everywhere] - Policy-Based Configuration Management for the
   Data-Driven-Infrastructure.
 
-  Copyright (C) 2015-2016 Graham Lee Bevan <graham.bevan@ntlworld.com>
+  Copyright (C) 2015-2017 Graham Lee Bevan <graham.bevan@ntlworld.com>
 
   This project is part of Partout - https://github.com/partoutx/partout.
 
