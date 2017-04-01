@@ -59,7 +59,7 @@ p2
 
     .logmsg('Configuring dnsmasq: {{ opts.title }}', {title: title, level: 'info'})
 
-    .file('/media/usb/tftproot', {ensure: 'directory'})
+    .file(opts.tftp_root, {ensure: 'directory'})
 
     .package('wget')
     .package('syslinux-common')

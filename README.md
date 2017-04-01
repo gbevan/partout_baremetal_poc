@@ -19,6 +19,13 @@ ssh cinder1 -l ubuntu "sudo dd if=/dev/zero of=/dev/sda bs=512 count=1 && sudo r
 ssh compute1 -l ubuntu "sudo dd if=/dev/zero of=/dev/sda bs=512 count=1 && sudo reboot"
 ```
 
+## Reboot the Openstack hosts
+```bash
+ssh controller1 -l ubuntu "sudo reboot"
+ssh cinder1 -l ubuntu "sudo reboot"
+ssh compute1 -l ubuntu "sudo reboot"
+```
+
 ## Example Wake-On-Lan script
 ```bash
 #!/bin/bash

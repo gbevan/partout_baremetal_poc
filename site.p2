@@ -26,9 +26,6 @@
 
 var cfg = require('./site.conf.json');
 
-//var controller1_mac = '6c:f0:49:44:c4:92',
-//    compute1_mac = '6c:f0:49:44:ca:62',
-//    cinder1_mac = '6c:f0:49:43:7b:50';
 var controller1_mac = '6c:f0:49:43:7b:50',
     cinder1_mac = '6c:f0:49:44:c4:92',
     compute1_mac = '6c:f0:49:44:ca:62';
@@ -41,7 +38,7 @@ var dhcp_hosts = [
 
 var dhcp_range = { from: '172.18.0.10', to: '172.18.0.253', lease_time: '12h' };
 var iface = 'eth1';
-var tftp_root = '/media/usb/tftproot';
+var tftp_root = '/tmp/tftproot';
 var dhcp_server_ip = '172.18.0.254';
 var default_pw = cfg.default_pw;
 var gateway = '192.168.0.1';
