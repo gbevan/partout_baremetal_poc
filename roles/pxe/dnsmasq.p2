@@ -84,7 +84,7 @@ p2
     .on('file:/etc/dnsmasq.conf:changed', function () {
       p2
       .service('dnsmasq', {ensure: 'stopped'})
-      .service('dnsmasq', {ensure: 'running'})
+      .service('dnsmasq', {ensure: 'running', enabled: true})
       ;
     })
 

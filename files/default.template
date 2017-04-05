@@ -3,4 +3,4 @@ PROMPT 0
 
 label linux
   kernel ubuntu-installer/amd64/linux
-  append ks=http://{{ opts.dhcp_server_ip }}/ks_{{ opts.name }}.cfg vga=788 initrd=ubuntu-installer/amd64/initrd.gz -- quiet
+  append ks=http://{{ opts.dhcp_server_ip }}/ks_{{ opts.name }}.cfg vga=788 initrd=ubuntu-installer/amd64/initrd.gz iommu=memaper=3 noapic acpi=off

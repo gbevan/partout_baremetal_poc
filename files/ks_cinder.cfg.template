@@ -42,8 +42,7 @@ install
 zerombr
 
 #System bootloader configuration
-bootloader --location=mbr
-#bootloader --location=partition
+bootloader --location=mbr --append="iommu=memaper=3 noapic acpi=off"
 
 #Partition clearing information
 clearpart --drives=sda --all --initlabel
@@ -92,6 +91,10 @@ curl -sL https://deb.nodesource.com/setup_6.x | bash -
 
 apt-get install -y nodejs
 apt-get install -y nfs-client
+
+# fix grub for "Reached target shutdown" hang on reboot
+sed -i 's/^.*GRUB_CMDLINE_LINUX_DEFAULT=.*/GRUB_CMDLINE_LINUX_DEFAULT="iommu=memaper=3 noapic acpi=off"/g' /etc/default/grub
+update-grub
 
 mkdir -p /opt/partout/agent
 
