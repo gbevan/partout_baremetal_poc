@@ -24,7 +24,12 @@
 'use strict';
 /*global p2*/
 
+// make parent node_modules available to sync'd manifest
+module.paths = module.paths.concat(module.parent.paths);
+
 var cfg = require('./site.conf.json');
+
+var heredoc = require('heredoc');
 
 var controller1_mac = '6c:f0:49:43:7b:50',
     cinder1_mac = '6c:f0:49:44:c4:92',
@@ -55,6 +60,16 @@ p2
 
 .node('pi3')
 .classify('pxe')
+
+.command('os upgrade', {
+  cmd: heredoc.strip(function() {/*
+  export DEBIAN_FRONTEND="noninteractive";
+  export APT_LISTBUGS_FRONTEND="none";
+  export APT_LISTCHANGES_FRONTEND="none";
+  apt-get update &&
+  apt-get upgrade -y
+  */})
+})
 
 .package('smartmontools')
 .package('ntp')

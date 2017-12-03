@@ -72,6 +72,11 @@ p2
     .package('dnsmasq')
     .service('dnsmasq', {ensure: 'running', enabled: true})
 
+    .file('/etc/dhcpcd.conf', {
+      ensure: 'file',
+      content: {template: path.join(__dirname, 'files', 'dhcpcd.conf')}
+    })
+
     .file('/etc/dnsmasq.conf', {
       ensure: 'file',
       content: {template: path.join(__dirname, 'files', 'dnsmasq.conf')},
