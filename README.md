@@ -43,7 +43,7 @@ COPYRIGHT
   Partout [Everywhere] - Policy-Based Configuration Management for the
   Data-Driven-Infrastructure.
 
-  Copyright (C) 2015-2017 Graham Lee Bevan <graham.bevan@ntlworld.com>
+  Copyright (C) 2015-2018 Graham Lee Bevan <graham.bevan@ntlworld.com>
 
   This project is part of Partout - https://github.com/partoutx/partout.
 
